@@ -6,10 +6,8 @@
 
 FROM python:3.11-slim
 
-# Metadata - Combined into single LABEL for proper syntax
-LABEL maintainer="Blooket Host Bot" \
-      description="Professional Blooket game host automation with live preview" \
-      version="2.0.1"
+# Metadata - FIXED: Single LABEL line with all key=value pairs
+LABEL maintainer="Blooket Host Bot" description="Professional Blooket game host automation with live preview" version="2.0.1"
 
 # Environment Configuration
 ENV PYTHONUNBUFFERED=1 \
@@ -397,21 +395,6 @@ HTML_TEMPLATE = """
             color: #ff9999;
         }
 
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #ff0000;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         .vnc-link {
             display: block;
             background: rgba(255, 165, 0, 0.2);
@@ -460,7 +443,6 @@ HTML_TEMPLATE = """
         </div>
 
         <div class="main-grid">
-            <!-- Control Panel -->
             <div class="card">
                 <h2>⚙️ Control Panel</h2>
                 
@@ -475,21 +457,11 @@ HTML_TEMPLATE = """
                     <input type="text" id="blooketUrl" placeholder="https://goldquest.blooket.com/gold/host/landing?gid=...">
                 </div>
 
-                <button class="button" id="hostBtn" onclick="hostGame()">
-                    🚀 HOST GAME
-                </button>
+                <button class="button" id="hostBtn" onclick="hostGame()">🚀 HOST GAME</button>
+                <button class="button secondary" id="clickBtn" onclick="clickHostButton()" disabled>👆 CLICK HOST BUTTON</button>
+                <button class="button secondary" id="stopBtn" onclick="stopBrowser()" disabled>⛔ STOP BROWSER</button>
 
-                <button class="button secondary" id="clickBtn" onclick="clickHostButton()" disabled>
-                    👆 CLICK HOST BUTTON
-                </button>
-
-                <button class="button secondary" id="stopBtn" onclick="stopBrowser()" disabled>
-                    ⛔ STOP BROWSER
-                </button>
-
-                <a href="http://localhost:6080/vnc.html" target="_blank" class="vnc-link">
-                    📺 Open Full VNC Viewer
-                </a>
+                <a href="http://localhost:6080/vnc.html" target="_blank" class="vnc-link">📺 Open Full VNC Viewer</a>
 
                 <div style="margin-top: 20px;">
                     <h3 style="color: #ff3333; margin-bottom: 10px; font-size: 1.2em;">📋 Activity Log</h3>
@@ -499,7 +471,6 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <!-- Live Preview -->
             <div class="card">
                 <div class="preview-container">
                     <div class="preview-header">
@@ -510,10 +481,7 @@ HTML_TEMPLATE = """
                         </div>
                     </div>
                     <div class="preview-screen" id="previewScreen">
-                        <div class="preview-placeholder">
-                            🖥️ Browser preview will appear here<br>
-                            <small>Updates every 2 seconds when active</small>
-                        </div>
+                        <div class="preview-placeholder">🖥️ Browser preview will appear here<br><small>Updates every 2 seconds when active</small></div>
                     </div>
                 </div>
             </div>
@@ -550,7 +518,7 @@ HTML_TEMPLATE = """
             const entry = document.createElement('div');
             entry.className = 'log-entry ' + type;
             const timestamp = new Date().toLocaleTimeString();
-            entry.textContent = `[${timestamp}] ${message}`;
+            entry.textContent = '[' + timestamp + '] ' + message;
             container.appendChild(entry);
             container.scrollTop = container.scrollHeight;
             
@@ -595,11 +563,11 @@ HTML_TEMPLATE = """
             const url = document.getElementById('blooketUrl').value.trim();
 
             if (!url || !url.includes('blooket.com')) {
-                showStatus('❌ Please enter a valid Blooket URL', 'error');
+                showStatus('Please enter a valid Blooket URL', 'error');
                 return;
             }
 
-            showStatus('🚀 Starting browser and navigating...', 'info');
+            showStatus('Starting browser and navigating...', 'info');
             addLog('Initializing browser...', 'info');
 
             try {
@@ -612,20 +580,20 @@ HTML_TEMPLATE = """
                 const data = await response.json();
 
                 if (response.ok) {
-                    showStatus('✅ Browser started! Navigate to host page.', 'success');
+                    showStatus('Browser started! Navigate to host page.', 'success');
                     addLog(data.message, 'success');
                 } else {
-                    showStatus('❌ Error: ' + data.error, 'error');
+                    showStatus('Error: ' + data.error, 'error');
                     addLog('Error: ' + data.error, 'error');
                 }
             } catch (error) {
-                showStatus('❌ Network error: ' + error.message, 'error');
+                showStatus('Network error: ' + error.message, 'error');
                 addLog('Network error: ' + error.message, 'error');
             }
         }
 
         async function clickHostButton() {
-            showStatus('👆 Clicking host button...', 'info');
+            showStatus('Clicking host button...', 'info');
             addLog('Attempting to click host button...', 'info');
 
             try {
@@ -636,20 +604,20 @@ HTML_TEMPLATE = """
                 const data = await response.json();
 
                 if (response.ok) {
-                    showStatus('✅ ' + data.message, 'success');
+                    showStatus(data.message, 'success');
                     addLog(data.message, 'success');
                 } else {
-                    showStatus('❌ Error: ' + data.error, 'error');
+                    showStatus('Error: ' + data.error, 'error');
                     addLog('Error: ' + data.error, 'error');
                 }
             } catch (error) {
-                showStatus('❌ Network error: ' + error.message, 'error');
+                showStatus('Network error: ' + error.message, 'error');
                 addLog('Network error: ' + error.message, 'error');
             }
         }
 
         async function stopBrowser() {
-            showStatus('⛔ Stopping browser...', 'info');
+            showStatus('Stopping browser...', 'info');
             addLog('Stopping browser...', 'info');
 
             try {
@@ -660,16 +628,15 @@ HTML_TEMPLATE = """
                 const data = await response.json();
 
                 if (response.ok) {
-                    showStatus('✅ Browser stopped', 'success');
+                    showStatus('Browser stopped', 'success');
                     addLog('Browser stopped', 'success');
-                    document.getElementById('previewScreen').innerHTML = 
-                        '<div class="preview-placeholder">🖥️ Browser preview will appear here</div>';
+                    document.getElementById('previewScreen').innerHTML = '<div class="preview-placeholder">Browser preview will appear here</div>';
                 } else {
-                    showStatus('❌ Error: ' + data.error, 'error');
+                    showStatus('Error: ' + data.error, 'error');
                     addLog('Error: ' + data.error, 'error');
                 }
             } catch (error) {
-                showStatus('❌ Network error: ' + error.message, 'error');
+                showStatus('Network error: ' + error.message, 'error');
                 addLog('Network error: ' + error.message, 'error');
             }
         }
@@ -690,7 +657,6 @@ HTML_TEMPLATE = """
 """
 
 def create_driver():
-    """Create a Chrome driver with visible window"""
     options = Options()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -713,7 +679,6 @@ def create_driver():
     return driver
 
 def screenshot_loop():
-    """Continuously take screenshots and send to clients"""
     global browser_instance, screenshot_running
     
     while screenshot_running:
@@ -899,21 +864,11 @@ def stop_browser():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
-    print(f"""
-╔══════════════════════════════════════════╗
-║  Blooket Host Bot Pro - READY           ║
-╠══════════════════════════════════════════╣
-║  🌐 Server:  http://0.0.0.0:{port}        ║
-║  📺 VNC:     http://0.0.0.0:6080        ║
-║  🎮 Status:  ACTIVE                      ║
-╚══════════════════════════════════════════╝
-    """)
+    print(f"Blooket Host Bot Pro - READY on http://0.0.0.0:{port}")
     socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True)
 APPEOF
 
-# Create supervisor configuration for VNC services
-RUN mkdir -p /var/log/supervisor && \
-    cat > /etc/supervisor/conf.d/services.conf << 'SUPERVISOREOF'
+RUN mkdir -p /var/log/supervisor && cat > /etc/supervisor/conf.d/services.conf << 'SUPERVISOREOF'
 [supervisord]
 nodaemon=true
 user=root
@@ -966,7 +921,6 @@ stderr_logfile_maxbytes=0
 environment=DISPLAY=":99",PORT="%(ENV_PORT)s"
 SUPERVISOREOF
 
-# Create startup script
 RUN cat > /start.sh << 'STARTEOF'
 #!/bin/bash
 set -e
@@ -1007,7 +961,6 @@ STARTEOF
 
 RUN chmod +x /start.sh
 
-# Health check script
 RUN cat > /healthcheck.sh << 'HEALTHEOF'
 #!/bin/bash
 PORT=${PORT:-10000}
@@ -1016,15 +969,10 @@ HEALTHEOF
 
 RUN chmod +x /healthcheck.sh
 
-# Expose ports
 EXPOSE 10000 5900 6080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD /healthcheck.sh
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 CMD /healthcheck.sh
 
-# Working directory
 WORKDIR /app
 
-# Run
 ENTRYPOINT ["/start.sh"]
